@@ -17,7 +17,18 @@ router
 				res.status(500).json({success: false, message: "No users found", error})
 			})
 	})
-	.post((req, res) => {});
+	.post((req, res) => {
+		const user = req.body;
+		db.insert(user)
+			.then(user => {
+				!user.name
+					? res.status(400).json({success: false, message: "Provide a name"})
+					: res.status(201).json({success: true, message: "User added"})
+			})
+			.catch(error => {
+				res.status(500).json({success: false, message: "User not created", error})
+			})
+	});
 
 router
 	.route('/:id')
