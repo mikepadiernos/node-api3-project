@@ -32,9 +32,47 @@ router
 
 router
 	.route('/:id')
-	.get((req, res) => {})
-	.delete((req, res) => {})
-	.put((req, res) => {});
+	.get((req, res) => {
+		db.getById(req.params.id)
+			.then(user => {
+				res.status(400).json({success: true, message: "User found", user})
+			})
+			.catch(error => {
+				res.status(500).json({success: false, message: "No user found", error})
+			})
+	})
+	.put((req, res) => {
+		const id = req.params.id;
+		const info = req.body;
+		db.update(id, info)
+			.then(user => {
+				!info.name && user
+					? res.status(404).json({success: false, message: "User not found"})
+					: res.status(200).json({success: true, message: "User updated", User: info})
+			})
+			.catch(error => {
+				res.status(500).json({success: false, message: "User not updated", error})
+			})
+	})
+	.delete((req, res) => {
+		const id = req.params.id;
+		db.getById(id)
+			.then(user => {
+				!user
+					? res.status(404).json({success: false, message: "User found"})
+					: db.remove(id)
+							.then(del => {
+								if (del) {res.status(200).json({success: true, user})}
+							})
+							.catch(error => {
+								res.status(500).json({success: false, message: "User not removed", error})
+							})
+			})
+			.catch(error => {
+				res.status(500).json({success: false, message: "User not removed", error})
+			})
+	});
+
 
 router
 	.route('/:id/posts')
