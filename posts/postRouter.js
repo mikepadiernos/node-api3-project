@@ -1,27 +1,19 @@
+// INITIATE EXPRESS
 const express = require('express');
+let router = express.Router();
 
-const router = express.Router();
+// IMPORT DATABASE
+const db = require('./postDb');
 
-router.get('/', (req, res) => {
-  // do your magic!
-});
 
-router.get('/:id', (req, res) => {
-  // do your magic!
-});
+router
+	.route('/')
+	.get((req, res) => {});
 
-router.delete('/:id', (req, res) => {
-  // do your magic!
-});
-
-router.put('/:id', (req, res) => {
-  // do your magic!
-});
-
-// custom middleware
-
-function validatePostId(req, res, next) {
-  // do your magic!
-}
+router
+	.route('/:id')
+	.get((req, res) => {})
+	.put((req, res) => {})
+	.delete((req, res) => {});
 
 module.exports = router;

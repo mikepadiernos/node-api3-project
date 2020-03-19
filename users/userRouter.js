@@ -23,7 +23,7 @@ router
 			.then(user => {
 				!user.name
 					? res.status(400).json({success: false, message: "Provide a name"})
-					: res.status(201).json({success: true, message: "User added"})
+					: res.status(201).json({success: true, message: "User added", User: user})
 			})
 			.catch(error => {
 				res.status(500).json({success: false, message: "User not created", error})
@@ -56,6 +56,7 @@ router
 	})
 	.delete((req, res) => {
 		const id = req.params.id;
+		const info = req.body;
 		db.getById(id)
 			.then(user => {
 				!user
@@ -76,21 +77,19 @@ router
 
 router
 	.route('/:id/posts')
-	.get((req, res) => {})
+	.get((req, res) => {
+		const id = req.params.id;
+		const info = req.body;
+		db.getUserPosts(id)
+			.then(posts => {
+				!posts
+					? res.status(404).json({success: false, message: "No posts found"})
+					: res.status(200).json(posts)
+			})
+			.catch(error => {
+				res.status(500).json({success: false, message: "No posts found", error})
+			})
+	})
 	.post((req, res) => {});
-
-//custom middleware
-
-function validateUserId(req, res, next) {
-  // do your magic!
-}
-
-function validateUser(req, res, next) {
-  // do your magic!
-}
-
-function validatePost(req, res, next) {
-  // do your magic!
-}
 
 module.exports = router;
