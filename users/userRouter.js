@@ -1,9 +1,18 @@
 // INITIATE EXPRESS
 const express = require('express');
-let router = express.Router();
+const router = express.Router();
 
-// IMPORT DATABASE
+// IMPORT MIDDLEWARES
+const middle = require('../middleware/middleware');
+
+// MIDDLEWARES
+const validUser = middle.validUser;
+const validUserId = middle.validUserId;
+const validPost = middle.validPost;
+
+// IMPORT DATABASES
 const db = require('./userDb');
+const postDb = require('../posts/postDb');
 
 router
 	.route('/')
@@ -17,7 +26,7 @@ router
 				res.status(500).json({success: false, message: "No users found", error})
 			})
 	})
-	.post((req, res) => {
+	.post(validUser, (req, res) => {
 		const user = req.body;
 		db.insert(user)
 			.then(user => {
@@ -32,7 +41,7 @@ router
 
 router
 	.route('/:id')
-	.get((req, res) => {
+	.get(validUserId, (req, res) => {
 		db.getById(req.params.id)
 			.then(user => {
 				res.status(400).json({success: true, message: "User found", user})
@@ -41,7 +50,7 @@ router
 				res.status(500).json({success: false, message: "No user found", error})
 			})
 	})
-	.put((req, res) => {
+	.put(validUserId, (req, res) => {
 		const id = req.params.id;
 		const info = req.body;
 		db.update(id, info)
@@ -54,9 +63,9 @@ router
 				res.status(500).json({success: false, message: "User not updated", error})
 			})
 	})
-	.delete((req, res) => {
+	.delete(validUserId, (req, res) => {
 		const id = req.params.id;
-		const info = req.body;
+		// const info = req.body;
 		db.getById(id)
 			.then(user => {
 				!user
@@ -77,7 +86,7 @@ router
 
 router
 	.route('/:id/posts')
-	.get((req, res) => {
+	.get(validUserId, (req, res) => {
 		const id = req.params.id;
 		const info = req.body;
 		db.getUserPosts(id)
@@ -90,6 +99,29 @@ router
 				res.status(500).json({success: false, message: "No posts found", error})
 			})
 	})
-	.post((req, res) => {});
+	.post(validUserId, validPost, (req, res) => {
+		const id = req.params.id;
+		const info = req.body;
+		let newPost = {
+			text: info,
+			user_id: id
+		};
+		db.getById(id)
+			.then(post => {
+				!post
+					? res.status()
+					: postDb
+						.insert(newPost)
+						.then(post => {
+							res.status(201).json({success: true, message: "Post added", post})
+						})
+						.catch(error => {
+							res.status(500).json({success: false, message: "No post added", error})
+						})
+			})
+			.catch(error => {
+				res.status(500).json({success: false, message: "No post added", error})
+			})
+	});
 
 module.exports = router;

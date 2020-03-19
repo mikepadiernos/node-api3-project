@@ -7,7 +7,7 @@ const helmet          = require('helmet');
 const middle          = require('./middleware/middleware');
 
 // MIDDLEWARES
-const logger          = middle.logger();
+const logger          = middle.logger;
 
 // IMPORT ROUTERS
 const users           = require('./users/userRouter');
@@ -16,8 +16,7 @@ const posts           = require('./posts/postRouter');
 // INITIATE EXPRESS AS SERVER
 const server          = express();
 
-server.use(helmet(), logger, express.json());
-server.use(cors());
+server.use(helmet(), logger, express.json(), cors());
 
 server
   .route('/')
