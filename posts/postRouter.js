@@ -40,7 +40,7 @@ router
 	.put(validPost, validPostId, (req, res) => {
 		const id = req.params.id;
 		const info = req.body;
-		db.update(id)
+		db.update(id, info)
 			.then(post => {
 				!info.text && post
 					? res.status(404).json({success: false, message: "Post not updated", post})
