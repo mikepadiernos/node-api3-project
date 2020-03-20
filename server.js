@@ -1,13 +1,35 @@
-const express = require('express');
+// IMPORT MODULES
+const express         = require('express');
+const cors            = require('cors');
+const helmet          = require('helmet');
 
-const server = express();
+// IMPORT MIDDLEWARES
+const middle          = require('./middleware/middleware');
 
-server.get('/', (req, res) => {
-  res.send(`<h2>Let's write some middleware!</h2>`);
-});
+// MIDDLEWARES
+const logger          = middle.logger;
 
-//custom middleware
+// IMPORT ROUTERS
+const users           = require('./users/userRouter');
+const posts           = require('./posts/postRouter');
 
-function logger(req, res, next) {}
+// INITIATE EXPRESS AS SERVER
+const server          = express();
+
+server.use(helmet(), logger, express.json(), cors());
+
+server
+  .route('/')
+  .get( (req, res) => {
+    res.send(`<h2>Let's write some middleware!</h2>`);
+  });
+
+// ROUTER - "./api/users"
+server.use('/api/users', users);
+server.use('/users', users);
+
+// ROUTER - "./api/posts"
+server.use('/api/posts', posts);
+server.use('/posts', posts);
 
 module.exports = server;
